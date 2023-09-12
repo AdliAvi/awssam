@@ -1,4 +1,5 @@
 import requests
+import json
 
 def handler(event, context):
     response = requests.get("https://jsonplaceholder.typicode.com/todos/1")

@@ -15,7 +15,7 @@ package:
 
 functions:
   theLambda:
-    name: test-lambda
+    name: lambda-github
     handler: lambda.handler
     description: A test lambda
     timeout: 30

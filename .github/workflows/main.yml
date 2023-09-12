@@ -71,6 +71,3 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          #aws_region: us-east-1
-          #function_name: "lambda-function-name"
-          #zip_file: "dist.zip"
