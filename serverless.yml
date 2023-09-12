@@ -14,7 +14,7 @@ package:
 
 functions:
   theLambda:
-    name: lambda-github
+    name: lambda-github-new
     handler: lambda.handler
     description: lambda-github
     timeout: 5 # seconds
