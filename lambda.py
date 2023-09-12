@@ -8,5 +8,6 @@ def handler(event, context):
         "context": context
     }
     print(res)
+    print("Hello World")
 
     return None
