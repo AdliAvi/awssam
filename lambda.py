@@ -9,6 +9,6 @@ def handler(event, context):
     #    "context": context
     # }
     # print(res)
-    print("Hello World please work")
+    print("Hello World please work after deleting")
 
     return None
