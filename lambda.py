@@ -6,6 +6,7 @@ logger.setLevel(logging.INFO)
 def lambda_handler(event, context):
     ...
     result = None
+    
     action = event.get('action')
     if action == 'increment':
         result = event.get('number', 0) + 1
