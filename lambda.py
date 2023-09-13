@@ -1,14 +1,17 @@
-import requests
-import json
+import logging
 
-def handler(event, context):
-    #response = requests.get("https://jsonplaceholder.typicode.com/todos/1")
-    #res = {
-    #    "event": event,
-    #    "output": response.json(),
-    #    "context": context
-    # }
-    # print(res)
-    print("Hello World please work after deleting")
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
-    return None
+def lambda_handler(event, context):
+    ...
+    result = None
+    action = event.get('action')
+    if action == 'increment':
+        result = event.get('number', 0) + 1
+        logger.info('Calculated result of %s', result)
+    else:
+        logger.error("%s is not a valid action.", action)
+
+    response = {'result': result}
+    return response
