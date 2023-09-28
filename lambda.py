@@ -39,11 +39,11 @@ def handler(event, context):
         if word_answer is None:
             generate_guess_word()
         
-        if current_attempts >= MAX_ATTEMPTS:
-            return {"message": "You have used all your attempts."}
+        # if current_attempts >= MAX_ATTEMPTS:
+        #     return {"message": "You have used all your attempts."}
         
         # Increment the attempt count
-        current_attempts += 1
+        # current_attempts += 1
         
         # GetPerson call database
         print("This is the Guess Word Inputted")
@@ -52,7 +52,6 @@ def handler(event, context):
         
         # temporary game id to block github check
         game_id = "asd"
-        
         answer = {}
         
         response = table.get_item(Key={'game_id': game_id})
