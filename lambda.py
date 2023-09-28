@@ -1,7 +1,6 @@
 import json
 import uuid
 import random
-import boto3
 
 # Failed once I tried changing stuff
 # logger = logging.getLogger()
@@ -10,6 +9,9 @@ import boto3
 GUESS_WORD_API_PATH = "/getPerson"
 CREATE_RAW_PATH = "/createPerson"
 MAX_ATTEMPTS = 5  # Adjust this value as needed
+
+# dynamodb_client = boto3.resource('dynamodb')
+# table = dynamodb_client.Table('wordGuess')
 
 # Global variables to store the word and the current attempt count
 word_answer = None
@@ -29,53 +31,45 @@ def generate_guess_word():
 def handler(event, context):
     global current_attempts
     
-    dynamodb = boto3.resource('dynamodb')
-    table_name = "wordleGuess"
-    table = dynamodb.Table(table_name)
-    
     print(event)
     
     if event['rawPath'] == GUESS_WORD_API_PATH:
-        game_id = event['game_id']
-        
         if word_answer is None:
             generate_guess_word()
         
-        # if current_attempts >= MAX_ATTEMPTS:
-        #     return {"message": "You have used all your attempts."}
+        if current_attempts >= MAX_ATTEMPTS:
+            return {"message": "You have used all your attempts."}
         
         # Increment the attempt count
-        # current_attempts += 1
+        current_attempts += 1
         
         # GetPerson call database
         print("This is the Guess Word Inputted")
         word_guess = event['queryStringParameters']['guessWord']
         print("Received guess word " + word_guess)
         
-        # temporary game id to block github check
         answer = {}
         
-        response = table.get_item(Key={'game_id': game_id})
-        if 'Item' in response:
-            tries_left = response['Item']['tries_left']
-            
-            n = 0        
-            for char, word in zip(word_answer, word_guess):
-                n += 1
-                char1 = str(n) + ". " + word
-                if char == word:
-                    answer[char1] = "✔"
-                elif word in word_answer:
-                    answer[char1] = "➕"
-                else:
-                    answer[char1] = "❌"
+        n = 0
+        for char, word in zip(word_answer, word_guess):
+            n += 1
+            char1 = str(n) + ". " + word
+            if char == word:
+                answer[char1] = "✔"
+            elif word in word_answer:
+                answer[char1] = "➕"
+            else:
+                answer[char1] = "❌"
 
-            tries_left += 1
-            
-            return {"answer": answer, "tries_left": tries_left}
-        else:
-            return {"message": "Game not found"}
+        answer['attempt_left'] = 5-n
+        
+        return answer
     
-    #elif event['rawPath'] == CREATE_RAW_PATH:
-        # Create a DB table to store the word and game id to use continously
-    
+    elif event['rawPath'] == CREATE_RAW_PATH:
+        # CreatePerson Path -- write to database
+        print("Start Request for CreatePerson2")
+        decodedEvent = json.loads(event['body'])
+        firstName = decodedEvent['firstName']
+        print("Received request with firstname =" + firstName)
+        # call database
+        return {"personID": str(uuid.uuid1())}
