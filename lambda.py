@@ -76,6 +76,5 @@ def handler(event, context):
         else:
             return {"message": "Game not found"}
     
-    elif event['rawPath'] == CREATE_RAW_PATH:
+    #elif event['rawPath'] == CREATE_RAW_PATH:
         # Create a DB table to store the word and game id to use continously
-        
