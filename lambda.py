@@ -12,7 +12,7 @@ CREATE_RAW_PATH = "/createPerson"
 MAX_ATTEMPTS = 5  # Adjust this value as needed
 
 dynamodb_client = boto3.resource('dynamodb')
-table = dynamodb_client.Table('wordGuess')
+table = dynamodb_client.Table('wordleGuess')
 
 # Global variables to store the word and the current attempt count
 word_answer = None
@@ -31,6 +31,10 @@ def generate_guess_word():
 
 def handler(event, context):
     global current_attempts
+    
+    dynamodb_client = boto3.resource('dynamodb')
+    table_name = "wordle_table"
+    table = dynamodb.Table(table_name)
     
     print(event)
     
@@ -51,26 +55,27 @@ def handler(event, context):
         
         answer = {}
         
-        n = 0
-        for char, word in zip(word_answer, word_guess):
-            n += 1
-            char1 = str(n) + ". " + word
-            if char == word:
-                answer[char1] = "✔"
-            elif word in word_answer:
-                answer[char1] = "➕"
-            else:
-                answer[char1] = "❌"
+        response = table.get_item(Key={'game_id': game_id})
+        if 'Item' in response:
+            tries_left = response['Item']['tries_left']
+            
+            n = 0        
+            for char, word in zip(word_answer, word_guess):
+                n += 1
+                char1 = str(n) + ". " + word
+                if char == word:
+                    answer[char1] = "✔"
+                elif word in word_answer:
+                    answer[char1] = "➕"
+                else:
+                    answer[char1] = "❌"
 
-        answer['attempt_left'] = 5-n
-        
-        return answer
+            tries_left += 1
+            
+            return {"answer": answer, "tries_left": tries_left}
+        else:
+            return {"message": "Game not found"}
     
     elif event['rawPath'] == CREATE_RAW_PATH:
-        # CreatePerson Path -- write to database
-        print("Start Request for CreatePerson2")
-        decodedEvent = json.loads(event['body'])
-        firstName = decodedEvent['firstName']
-        print("Received request with firstname =" + firstName)
-        # call database
-        return {"personID": str(uuid.uuid1())}
+        # Create a DB table to store the word and game id to use continously
+        
