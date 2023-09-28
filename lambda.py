@@ -3,7 +3,6 @@ import uuid
 import random
 
 logger = logging.getLogger()
-logger.setLevel(logging.INFO)
 
 GUESS_WORD_API_PATH = "/getPerson"
 CREATE_RAW_PATH = "/createPerson"
