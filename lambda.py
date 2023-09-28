@@ -10,8 +10,8 @@ GUESS_WORD_API_PATH = "/getPerson"
 CREATE_RAW_PATH = "/createPerson"
 MAX_ATTEMPTS = 5  # Adjust this value as needed
 
-# dynamodb_client = boto3.resource('dynamodb')
-# table = dynamodb_client.Table('wordGuess')
+dynamodb_client = boto3.resource('dynamodb')
+table = dynamodb_client.Table('wordGuess')
 
 # Global variables to store the word and the current attempt count
 word_answer = None
@@ -28,7 +28,7 @@ def generate_guess_word():
     words_answer = load_words("randomwords.txt", 5)
     word_answer = random.choice(words_answer)
 
-def lambda_handler(event, context):
+def handler(event, context):
     global current_attempts
     
     print(event)
