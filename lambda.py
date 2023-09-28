@@ -36,6 +36,8 @@ def handler(event, context):
     print(event)
     
     if event['rawPath'] == GUESS_WORD_API_PATH:
+        game_id = event['game_id']
+        
         if word_answer is None:
             generate_guess_word()
         
@@ -51,7 +53,6 @@ def handler(event, context):
         print("Received guess word " + word_guess)
         
         # temporary game id to block github check
-        game_id = "asd"
         answer = {}
         
         response = table.get_item(Key={'game_id': game_id})
