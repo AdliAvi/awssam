@@ -29,7 +29,7 @@ def generate_guess_word():
 def handler(event, context):
     global current_attempts
     
-    dynamodb_client = boto3.resource('dynamodb')
+    dynamodb = boto3.resource('dynamodb')
     table_name = "wordleGuess"
     table = dynamodb.Table(table_name)
     
