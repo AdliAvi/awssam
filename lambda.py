@@ -107,33 +107,7 @@ def handler(event, context):
             
             else:
                 return {"message": "You have not created a game yet."}    
-        
-        # Increment the attempt count
-        # current_attempts += 1
-        
-        # GetPerson call database
-        # print("This is the Guess Word Inputted")
-        # word_guess = event['queryStringParameters']['guessWord']
-        # print("Received guess word " + word_guess)
-        
-        # answer = {}
-        
-        # n = 0
-        # for char, word in zip(word_answer, word_guess):
-        #    n += 1
-        #    char1 = str(n) + ". " + word
-        #    if char == word:
-        #        answer[char1] = "✔"
-        #    elif word in word_answer:
-        #        answer[char1] = "➕"
-        #    else:
-        #        answer[char1] = "❌"
-
-        # answer['attempt_left'] = 5-n
-        
-        # return answer
-    
-    
+            
     elif event['rawPath'] == CREATE_RAW_PATH:
         # Takes input: wordLength from 4 - 8 to generate the word length
         # Generate a new random game_id
