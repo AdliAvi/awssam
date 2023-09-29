@@ -15,8 +15,8 @@ MAX_ATTEMPTS = 5  # Adjust this value as needed
 # table = dynamodb_client.Table('wordGuess')
 
 # Global variables to store the word and the current attempt count
-word_answer = None
-current_attempts = 0
+# word_answer = None
+# current_attempts = 0
 
 def load_words(filename, n):
     with open(filename, 'r') as f:
@@ -24,9 +24,13 @@ def load_words(filename, n):
     filtered_words = [word for word in words if len(word) == n]
     return filtered_words
 
-def generate_guess_word(n):
+def generate_guess_word():
     global word_answer
-    words_answer = load_words("randomwords.txt", n)
+    words_answer = load_words("randomwords.txt", 5)
+    
+    if not words_answer:
+        raise ValueError("No words of the specified length found in the word list.")
+    
     word_answer = random.choice(words_answer)
     return word_answer
 
@@ -87,8 +91,8 @@ def handler(event, context):
         word_len = event['queryStringParameters']['wordLength']
         
         # Generate word to guess
-        secret_word = generate_guess_word(word_len)
-        tries_left = word_len+1
+        secret_word = generate_guess_word()
+        tries_left = 6
         
         # Update DynamoDB with the new game_id
         table.put_item(Item={'game_id': game_id, 'tries_left': tries_left, 'secret_word': secret_word})
