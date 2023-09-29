@@ -98,15 +98,15 @@ def handler(event, context):
         try:
             response = table.get_item(Key={'game_id': game_id})
             
-        if 'Item' in response:
-            item = response['Item']
-            tries_left = item['tries_left']
-        
-            if tries_left <= 0:
-                return {"message": "You have used all your attempts."}
-        
-        else:
-            return {"message": "You have not created a game yet."}    
+            if 'Item' in response:
+                item = response['Item']
+                tries_left = item['tries_left']
+            
+                if tries_left <= 0:
+                    return {"message": "You have used all your attempts."}
+            
+            else:
+                return {"message": "You have not created a game yet."}    
         
         # Increment the attempt count
         # current_attempts += 1
