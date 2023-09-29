@@ -57,8 +57,10 @@ def handler(event, context):
             
             all_words = load_words("randomwords.txt", word_len)
             
-            if word_guess not in all_words:
-                return {"message": "Please enter a valid word from the dictionary"}
+            if word_guess not in all_words:    
+                message = f"The word {word_guess} is not in {word_len}-length word dictionary. Please enter a valid word from the dictionary."
+                return {"message": message}
+            
             else:
                 tries_left = tries_left - 1
                 n = 0
@@ -79,8 +81,8 @@ def handler(event, context):
                 
                 return answer
 
-            else:
-                return {"message": "No game_id found. Please create a new game by calling /createPerson"}
+        else:
+            return {"message": "No game_id found. Please create a new game by calling /createPerson"}
     
     elif event['rawPath'] == CREATE_RAW_PATH:
         # Takes input: wordLength from 4 - 8 to generate the word length
