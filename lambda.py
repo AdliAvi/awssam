@@ -24,9 +24,9 @@ def load_words(filename, n):
     filtered_words = [word for word in words if len(word) == n]
     return filtered_words
 
-def generate_guess_word():
+def generate_guess_word(word_len):
     global word_answer
-    words_answer = load_words("randomwords.txt", 5)
+    words_answer = load_words("randomwords.txt", word_len)
     
     if not words_answer:
         raise ValueError("No words of the specified length found in the word list.")
@@ -88,10 +88,12 @@ def handler(event, context):
         # Takes input: wordLength from 4 - 8 to generate the word length
         # Generate a new random game_id
         game_id = str(uuid.uuid4())  # Generate a UUID as a string
-        word_len = event['queryStringParameters']['wordLength']
+        word_length_str = event['queryStringParameters'].get('wordLength', None)
+        if word_length_str is not None and word_length_str.isdigit():
+            word_len = int(word_length_str)
         
         # Generate word to guess
-        secret_word = generate_guess_word()
+        secret_word = generate_guess_word(word_len)
         tries_left = 6
         
         # Update DynamoDB with the new game_id
