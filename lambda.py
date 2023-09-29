@@ -1,6 +1,7 @@
 import json
 import uuid
 import random
+import boto3
 
 # Failed once I tried changing stuff
 # logger = logging.getLogger()
