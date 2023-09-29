@@ -9,8 +9,7 @@ import boto3
 
 GUESS_WORD_API_PATH = "/getPerson"
 CREATE_RAW_PATH = "/createPerson"
-SOLVE_PATH = "/solvePerson"
-# MAX_ATTEMPTS = 5  # Adjust this value as needed
+MAX_ATTEMPTS = 5  # Adjust this value as needed
 
 # dynamodb_client = boto3.resource('dynamodb')
 # table = dynamodb_client.Table('wordGuess')
@@ -36,7 +35,6 @@ def generate_guess_word(word_len):
     return word_answer
 
 def handler(event, context):
-    # TO-DO -> Change this into patch methods
     global current_attempts
         
     dynamodb = boto3.resource('dynamodb')
@@ -45,22 +43,47 @@ def handler(event, context):
     
     print(event)
     
-    if event['rawPath'] == SOLVE_PATH:
-        game_id = event['queryStringParameters']['game_id']
+    if event['rawPath'] == GUESS_WORD_API_PATH:
         
-        try:
-            response = table.get_item(Key={'game_id': game_id})
-            
-            if 'Item' in response:
-                item = response['Item']
-                tries_left = item['tries_left']
-            
-                if tries_left <= 0:
-                    return {"message": "You have used all your attempts."}
-            
+        # Check if the game_id already exists in DynamoDB - otherwise ask them to create a new game
+        # response = table.get_item(Key={'game_id': game_id})
+        # if 'Item' in response:
+        #     tries_left = response['Item']['tries_left']
+        
+        # tries_left += 1
+        
+        if word_answer is None:
+            generate_guess_word()
+        
+        if current_attempts >= MAX_ATTEMPTS:
+            return {"message": "You have used all your attempts."}
+        
+        # Increment the attempt count
+        current_attempts += 1
+        
+        # GetPerson call database
+        print("This is the Guess Word Inputted")
+        word_guess = event['queryStringParameters']['guessWord']
+        print("Received guess word " + word_guess)
+        
+        answer = {}
+        
+        n = 0
+        for char, word in zip(word_answer, word_guess):
+            n += 1
+            char1 = str(n) + ". " + word
+            if char == word:
+                answer[char1] = "✔"
+            elif word in word_answer:
+                answer[char1] = "➕"
             else:
-                return {"message": "You have not created a game yet."}    
-            
+                answer[char1] = "❌"
+
+        answer['attempt_left'] = 5-n
+        
+        return answer
+    
+    
     elif event['rawPath'] == CREATE_RAW_PATH:
         # Takes input: wordLength from 4 - 8 to generate the word length
         # Generate a new random game_id
@@ -77,15 +100,7 @@ def handler(event, context):
         table.put_item(Item={'game_id': game_id, 'tries_left': tries_left, 'secret_word': secret_word})
         
         message = f"You have created a new game of wordle with {word_len} letter and {tries_left} guess. The game id is: {game_id}, use it to predict the word!"
-        
-        out_message = {
-            "word_len": word_len,
-            "tries_left": tries_left,
-            "game_id": game_id,
-            "message": message
-        }
-        
-        return out_message
+        return {"message": message}
         
         # Increment on number of visit
         
