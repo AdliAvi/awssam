@@ -47,12 +47,12 @@ def handler(event, context):
     if event['rawPath'] == SOLVE_PATH:
         
         # Check if the game_id already exists in DynamoDB - otherwise ask them to create a new game
+        game_id = event['queryStringParameters']['game_id']
         response = table.get_item(Key={'game_id': game_id})
         if 'Item' in response:
             tries_left = response['Item']['tries_left']
             secret_word = response['Item']['secret_word']
             word_guess = event['queryStringParameters']['guessWord']
-            game_id = response['Item']['game_id']
             
             tries_left = tries_left - 1
             for char, word in zip(word_guess, secret_word):
@@ -69,7 +69,7 @@ def handler(event, context):
             return answer
 
         else:
-            return {"message": "Please create a new game by calling /createPerson"}
+            return {"message": "No game_id found. Please create a new game by calling /createPerson"}
     
     elif event['rawPath'] == CREATE_RAW_PATH:
         # Takes input: wordLength from 4 - 8 to generate the word length
