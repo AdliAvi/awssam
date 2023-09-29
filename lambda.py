@@ -53,29 +53,34 @@ def handler(event, context):
             tries_left = response['Item']['tries_left']
             secret_word = response['Item']['secret_word']
             word_guess = event['queryStringParameters']['guessWord']
+            word_len = response['Item']['word_len']
             
-            answer = {}
+            all_words = load_words("randomwords.txt", word_len)
             
-            tries_left = tries_left - 1
-            n = 0
-            for char, word in zip(word_guess, secret_word):
-                n = n+1
-                char1 = str(n) + ". " + char
-                if char == word:
-                    answer[char1] = "✔"
-                elif char in secret_word:
-                    answer[char1] = "➕"
-                else:
-                    answer[char1] = "❌"
-                    
-            answer['tries_left'] = tries_left
-                    
-            table.put_item(Item={'game_id': game_id, 'tries_left': tries_left, 'secret_word': secret_word})
-            
-            return answer
+            if word_guess not in all_words:
+                return {"message": "Please enter a valid word from the dictionary"}
+            else:
+                tries_left = tries_left - 1
+                n = 0
+                answer = {}
+                for char, word in zip(word_guess, secret_word):
+                    n = n+1
+                    char1 = str(n) + ". " + char
+                    if char == word:
+                        answer[char1] = "✔"
+                    elif char in secret_word:
+                        answer[char1] = "➕"
+                    else:
+                        answer[char1] = "❌"
+                        
+                answer['tries_left'] = tries_left
+                        
+                table.put_item(Item={'game_id': game_id, 'tries_left': tries_left, 'secret_word': secret_word})
+                
+                return answer
 
-        else:
-            return {"message": "No game_id found. Please create a new game by calling /createPerson"}
+            else:
+                return {"message": "No game_id found. Please create a new game by calling /createPerson"}
     
     elif event['rawPath'] == CREATE_RAW_PATH:
         # Takes input: wordLength from 4 - 8 to generate the word length
