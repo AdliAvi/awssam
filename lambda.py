@@ -24,10 +24,11 @@ def load_words(filename, n):
     filtered_words = [word for word in words if len(word) == n]
     return filtered_words
 
-def generate_guess_word():
+def generate_guess_word(n):
     global word_answer
-    words_answer = load_words("randomwords.txt", 5)
+    words_answer = load_words("randomwords.txt", n)
     word_answer = random.choice(words_answer)
+    return word_answer
 
 def handler(event, context):
     global current_attempts
@@ -39,6 +40,14 @@ def handler(event, context):
     print(event)
     
     if event['rawPath'] == GUESS_WORD_API_PATH:
+        
+        # Check if the game_id already exists in DynamoDB - otherwise ask them to create a new game
+        # response = table.get_item(Key={'game_id': game_id})
+        # if 'Item' in response:
+        #     tries_left = response['Item']['tries_left']
+        
+        # tries_left += 1
+        
         if word_answer is None:
             generate_guess_word()
         
@@ -70,21 +79,21 @@ def handler(event, context):
         
         return answer
     
+    
     elif event['rawPath'] == CREATE_RAW_PATH:
-        # Lets use this to try to count stuff
+        # Takes input: wordLength from 4 - 8 to generate the word length
+        # Generate a new random game_id
+        game_id = str(uuid.uuid4())  # Generate a UUID as a string
+        word_len = event['queryStringParameters']['wordLength']
         
-        game_id = event['queryStringParameters']['game_id']
-        tries_left: int = 0
+        # Generate word to guess
+        secret_word = generate_guess_word(word_len)
+        tries_left = word_len+1
         
-        response = table.get_item(Key={'game_id': game_id})
-        if 'Item' in response:
-            tries_left = response['Item']['tries_left']
-            
-        tries_left += 1
+        # Update DynamoDB with the new game_id
+        table.put_item(Item={'game_id': game_id, 'tries_left': tries_left, 'secret_word': secret_word})
         
-        table.put_item(Item = {'game_id': game_id, 'tries_left': tries_left})
-        
-        message = f"Hello, player {game_id}, you have visited this page {tries_left} times"
+        message = f"You have created a new game of wordle with {word_len} letter and {tries_left} guess. The game id is: {game_id}, use it to predict the word!"
         return {"message": message}
         
         # Increment on number of visit
