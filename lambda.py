@@ -56,7 +56,6 @@ def handler(event, context):
             
             answer = {}
             
-            
             tries_left = tries_left - 1
             n = 0
             for char, word in zip(word_guess, secret_word):
@@ -64,10 +63,12 @@ def handler(event, context):
                 char1 = str(n) + ". " + word
                 if char == word:
                     answer[char1] = "✔"
-                elif char in secret_word:
+                elif char in word_guess:
                     answer[char1] = "➕"
                 else:
                     answer[char1] = "❌"
+                    
+            answer['tries_left'] = tries_left
                     
             table.put_item(Item={'game_id': game_id, 'tries_left': tries_left, 'secret_word': secret_word})
             
