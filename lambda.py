@@ -54,8 +54,13 @@ def handler(event, context):
             secret_word = response['Item']['secret_word']
             word_guess = event['queryStringParameters']['guessWord']
             
+            answer = {}
+            
+            
             tries_left = tries_left - 1
+            n = 0
             for char, word in zip(word_guess, secret_word):
+                n = n+1
                 char1 = str(n) + ". " + word
                 if char == word:
                     answer[char1] = "✔"
