@@ -82,17 +82,9 @@ def handler(event, context):
                 answer[char1] = "❌"
 
         answer['attempt_left'] = 5-n
-        
         return answer
     
     elif event['rawPath'] == SOLVE_PATH:
-        
-        # Check if the game_id already exists in DynamoDB - otherwise ask them to create a new game
-        # response = table.get_item(Key={'game_id': game_id})
-        # if 'Item' in response:
-        #     tries_left = response['Item']['tries_left']
-        
-        # tries_left += 1
         game_id = event['queryStringParameters']['game_id']
         
         try:
