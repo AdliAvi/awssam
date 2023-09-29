@@ -132,7 +132,7 @@ def handler(event, context):
             "message": message
         }
         
-        return {out_message}
+        return out_message
         
         # Increment on number of visit
         
