@@ -30,6 +30,10 @@ def generate_guess_word():
 
 def handler(event, context):
     global current_attempts
+        
+    dynamodb = boto3.resource('dynamodb')
+    table_name = 'wordGuess'
+    table = dynamodb.Table(table_name)
     
     print(event)
     
@@ -66,10 +70,30 @@ def handler(event, context):
         return answer
     
     elif event['rawPath'] == CREATE_RAW_PATH:
-        # CreatePerson Path -- write to database
-        print("Start Request for CreatePerson2")
-        decodedEvent = json.loads(event['body'])
-        firstName = decodedEvent['firstName']
-        print("Received request with firstname =" + firstName)
+        # Lets use this to try to count stuff
+        
+        game_id = event['queryStringParameters']['game_id']
+        visitCount: int = 0
+        
+        response = table.get_item(Key = {'game_id': 'game_id'})
+        if 'Item' in response:
+            visitCount = response['Item']['visitCount']
+            
+        visitCount += 1
+        
+        table.put_item(Item = {'game_id': game_id, 'visitCount': visitCount})
+        
+        message = f"Hello, player {game_id}, you have visited this page {visitCount} times"
+        return {"message": message}
+        
+        # Increment on number of visit
+        
+    
+    #    elif event['rawPath'] == CREATE_RAW_PATH:
+        # Lets use this to try to count stuff
+        #print("Start Request for CreatePerson2")
+        #decodedEvent = json.loads(event['body'])
+        #firstName = decodedEvent['firstName']
+        #print("Received request with firstname =" + firstName)
         # call database
-        return {"personID": str(uuid.uuid1())}
+        #return {"personID": str(uuid.uuid1())}
