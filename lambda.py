@@ -9,7 +9,8 @@ import boto3
 
 GUESS_WORD_API_PATH = "/getPerson"
 CREATE_RAW_PATH = "/createPerson"
-MAX_ATTEMPTS = 5  # Adjust this value as needed
+SOLVE_PATH = "/solvePerson"
+# MAX_ATTEMPTS = 5  # Adjust this value as needed
 
 # dynamodb_client = boto3.resource('dynamodb')
 # table = dynamodb_client.Table('wordGuess')
@@ -43,46 +44,31 @@ def handler(event, context):
     
     print(event)
     
-    if event['rawPath'] == GUESS_WORD_API_PATH:
+    if event['rawPath'] == SOLVE_PATH:
         
         # Check if the game_id already exists in DynamoDB - otherwise ask them to create a new game
-        # response = table.get_item(Key={'game_id': game_id})
-        # if 'Item' in response:
-        #     tries_left = response['Item']['tries_left']
-        
-        # tries_left += 1
-        
-        if word_answer is None:
-            generate_guess_word()
-        
-        if current_attempts >= MAX_ATTEMPTS:
-            return {"message": "You have used all your attempts."}
-        
-        # Increment the attempt count
-        current_attempts += 1
-        
-        # GetPerson call database
-        print("This is the Guess Word Inputted")
-        word_guess = event['queryStringParameters']['guessWord']
-        print("Received guess word " + word_guess)
-        
-        answer = {}
-        
-        n = 0
-        for char, word in zip(word_answer, word_guess):
-            n += 1
-            char1 = str(n) + ". " + word
-            if char == word:
-                answer[char1] = "✔"
-            elif word in word_answer:
-                answer[char1] = "➕"
-            else:
-                answer[char1] = "❌"
+        response = table.get_item(Key={'game_id': game_id})
+        if 'Item' in response:
+            tries_left = response['Item']['tries_left']
+            secret_word = response['Item']['secret_word']
+            word_guess = event['queryStringParameters']['guessWord']
+            
+            tries_left = tries_left - 1
+            for char, word in zip(word_guess, secret_word):
+                char1 = str(n) + ". " + word
+                if char == word:
+                    answer[char1] = "✔"
+                elif char in secret_word:
+                    answer[char1] = "➕"
+                else:
+                    answer[char1] = "❌"
+                    
+            table.put_item(Item={'game_id': game_id, 'tries_left': tries_left, 'secret_word': secret_word})
+            
+            return answer
 
-        answer['attempt_left'] = 5-n
-        
-        return answer
-    
+        else:
+            return {"message": "Please create a new game by calling /createPerson"}
     
     elif event['rawPath'] == CREATE_RAW_PATH:
         # Takes input: wordLength from 4 - 8 to generate the word length
