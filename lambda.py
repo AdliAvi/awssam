@@ -52,6 +52,7 @@ def handler(event, context):
             tries_left = response['Item']['tries_left']
             secret_word = response['Item']['secret_word']
             word_guess = event['queryStringParameters']['guessWord']
+            game_id = response['Item']['game_id']
             
             tries_left = tries_left - 1
             for char, word in zip(word_guess, secret_word):
