@@ -94,7 +94,7 @@ def handler(event, context):
         
         # Generate word to guess
         secret_word = generate_guess_word(word_len)
-        tries_left = 6
+        tries_left = word_len+1
         
         # Update DynamoDB with the new game_id
         table.put_item(Item={'game_id': game_id, 'tries_left': tries_left, 'secret_word': secret_word})
