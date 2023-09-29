@@ -90,7 +90,7 @@ def handler(event, context):
         tries_left = word_len+1
         
         # Update DynamoDB with the new game_id
-        table.put_item(Item={'game_id': game_id, 'tries_left': tries_left, 'secret_word': secret_word, 'word_len' = word_len})
+        table.put_item(Item={'game_id': game_id, 'tries_left': tries_left, 'secret_word': secret_word, 'word_len': word_len})
         
         message = f"You have created a new game of wordle with {word_len} letter and {tries_left} guess. The game id is: {game_id}, use it to predict the word!"
         
