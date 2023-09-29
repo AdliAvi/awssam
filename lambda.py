@@ -73,7 +73,7 @@ def handler(event, context):
     elif event['rawPath'] == CREATE_RAW_PATH:
         # Lets use this to try to count stuff
         
-        game_id = event['queryStringParameters']['game_id']
+        game_id = event['game_id']
         visitCount: int = 0
         
         response = table.get_item(Key = {'game_id': 'game_id'})
