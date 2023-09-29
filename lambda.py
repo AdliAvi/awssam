@@ -58,12 +58,12 @@ def handler(event, context):
             
             tries_left = tries_left - 1
             n = 0
-            for char, word in zip(word_guess, secret_word):
+            for char, word in zip(secret_word, word_guess):
                 n = n+1
                 char1 = str(n) + ". " + word
                 if char == word:
                     answer[char1] = "✔"
-                elif char in word_guess:
+                elif char in secret_word:
                     answer[char1] = "➕"
                 else:
                     answer[char1] = "❌"
