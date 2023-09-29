@@ -33,7 +33,7 @@ def handler(event, context):
     global current_attempts
         
     dynamodb = boto3.resource('dynamodb')
-    table_name = 'wordGuess'
+    table_name = 'simpleWordleCount'
     table = dynamodb.Table(table_name)
     
     print(event)
@@ -73,18 +73,18 @@ def handler(event, context):
     elif event['rawPath'] == CREATE_RAW_PATH:
         # Lets use this to try to count stuff
         
-        game_id = event['game_id']
-        visitCount: int = 0
+        game_id = event['queryStringParameters']['game_id']
+        tries_left: int = 0
         
-        response = table.get_item(Key = {'game_id': 'game_id'})
+        response = table.get_item(Key={'game_id': game_id})
         if 'Item' in response:
-            visitCount = response['Item']['visitCount']
+            tries_left = response['Item']['tries_left']
             
-        visitCount += 1
+        tries_left += 1
         
-        table.put_item(Item = {'game_id': game_id, 'visitCount': visitCount})
+        table.put_item(Item = {'game_id': game_id, 'tries_left': tries_left})
         
-        message = f"Hello, player {game_id}, you have visited this page {visitCount} times"
+        message = f"Hello, player {game_id}, you have visited this page {tries_left} times"
         return {"message": message}
         
         # Increment on number of visit
